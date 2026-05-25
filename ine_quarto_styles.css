@@ -57,6 +57,12 @@ General settings for revealjs format.
     font-size: 16px !important;
   }
 
+.reveal .full-height pre,
+.reveal .full-height pre code {
+  max-height: none !important;
+  overflow: visible !important;
+}
+
 .reveal .cell-output-display {
   font-size: 18px;
 }
@@ -110,7 +116,9 @@ Settings for text format
   color: #4a25db;
 }
 
-.small-par {
+.small-par,
+.small-par p,
+.small-par li {
   font-size: 18px !important;
 }
 
@@ -137,7 +145,11 @@ Settings for text format
   border-left: 6px solid #1381B0;
   padding: 10px 15px;
   margin: 10px 0;
-  font-size: 22px;
+  font-size: 18px;
+}
+
+.reveal section .concepto-box p {
+  font-size: 18px;
 }
 
 /*
@@ -282,6 +294,31 @@ Settings for colors
   font-size: 18px !important;
 }
 
+
+.bottom-note {
+  position: absolute;
+  bottom: 20px;
+  left: 40px;
+  right: 40px;
+}
+
 .compact-table table {
   margin: 0 !important;
 }
+
+.reveal .col3070 > div.column:first-child {
+  width: 70%;
+}
+.reveal .col3070 div.column:not(:first-child) {
+  width: 30%;
+}
+
+
+.reveal .col4060 > div.column:first-child {
+  width: 60%;
+}
+.reveal .col4060 div.column:not(:first-child) {
+  width: 40%;
+}
+
+
