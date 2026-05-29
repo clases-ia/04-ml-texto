@@ -17,6 +17,8 @@ code-annotations: hover
 ```{python}
 #| echo: false
 #| output: false
+import os
+import io
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -25,6 +27,11 @@ import seaborn as sns
 import re
 import warnings
 warnings.filterwarnings('ignore')
+
+from dotenv import load_dotenv
+from minio import Minio
+
+load_dotenv()
 
 import unicodedata
 import nltk
@@ -80,17 +87,37 @@ Trabajaremos con un dataset de **diálogos de Los Simpsons**. Contiene las líne
 -   Es un problema de **clasificación multiclase supervisada** (4 clases).
 :::
 
+:::: columns
+
+::: {.column width=50%}
+
 ```{python}
 #| echo: true
-data = pd.read_parquet("data/data_simpsons.parquet")
+client = Minio(
+    endpoint="api-minio.ine.gob.cl",
+    access_key=os.getenv("MINIO_ACCESS_KEY"),
+    secret_key=os.getenv("MINIO_SECRET_KEY"),
+    secure=True,
+)
+client._region_map["desarrollo"] = "us-east-1"
+response = client.get_object("desarrollo",
+  "ooee/clases_ia/datos/data_simpsons.parquet")
+content = response.read()
+data = pd.read_parquet(io.BytesIO(content))
 print(f"Shape: {data.shape}")
 print(f"Columnas: {data.columns.tolist()}")
 
 ```
 
+:::
 
+::: {.column width=50%}
 
-![](imagenes/simpsons3d.jpg){width=45%}
+![](imagenes/simpsons3d.jpg){width=85%}
+
+:::
+
+::::
 
 ## Datos: Los Simpsons
 
@@ -458,7 +485,7 @@ $$TF\text{-}IDF(t,d) = TF(t,d) \times IDF(t)$$
 ::: notes
 
 
--   Si $t$ aparece en **todos** los documentos → $IDF \approx 1$ → el término $TF-IDF\approx TF$ .
+-   Si $t$ aparece en **todos** los documentos → $IDF \approx log(1)=0$ → el término $TF-IDF\approx 0$ .
 -   Si $t$ es **exclusivo** de pocos documentos → $IDF$ alto → el término gana peso.
 
 
@@ -1146,6 +1173,12 @@ Algunas extensiones naturales a lo visto hoy:
 -   **Umbral de decisión**: ajustar con `predict_proba()` para optimizar precisión vs. recall según el problema.
 :::
 
+
+## Ejercicio para hacer
+
+Les dejé un archivo `ciuo.parquet`. La idea es que entrenen un clasificador ciuo usando los conceptos
+aprendidos en esta clase.
+
 #
 
 [<img src="imagenes/logo_portada2.png" width="20%"/>]{.center-justified}
@@ -1158,3 +1191,17 @@ Algunas extensiones naturales a lo visto hoy:
 
 
 [**Mayo 2026**]{.big-par .center-justified}
+
+# Anexo 1 {visibility="uncounted"}
+
+## Muestra 1 {visibility="uncounted"}
+
+![](imagenes/muestra1.png){width=80%}
+
+## Muestra 2 {visibility="uncounted"}
+
+![](imagenes/muestra2.png){width=80%}
+
+## Muestra 3 {visibility="uncounted"}
+
+![](imagenes/muestra3.png){width=80%}

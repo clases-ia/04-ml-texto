@@ -228,23 +228,37 @@
 <li>Es un problema de <strong>clasificación multiclase supervisada</strong> (4 clases).</li>
 </ul>
 </div>
-<div id="643ed405" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>data <span class="op">=</span> pd.read_parquet(<span class="st">"data/data_simpsons.parquet"</span>)</span>
-<span id="cb1-2"><a href=""></a><span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb1-3"><a href=""></a><span class="bu">print</span>(<span class="ss">f"Columnas: </span><span class="sc">{</span>data<span class="sc">.</span>columns<span class="sc">.</span>tolist()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div id="4e13a002" class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href=""></a>client <span class="op">=</span> Minio(</span>
+<span id="cb1-2"><a href=""></a>    endpoint<span class="op">=</span><span class="st">"api-minio.ine.gob.cl"</span>,</span>
+<span id="cb1-3"><a href=""></a>    access_key<span class="op">=</span>os.getenv(<span class="st">"MINIO_ACCESS_KEY"</span>),</span>
+<span id="cb1-4"><a href=""></a>    secret_key<span class="op">=</span>os.getenv(<span class="st">"MINIO_SECRET_KEY"</span>),</span>
+<span id="cb1-5"><a href=""></a>    secure<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb1-6"><a href=""></a>)</span>
+<span id="cb1-7"><a href=""></a>client._region_map[<span class="st">"desarrollo"</span>] <span class="op">=</span> <span class="st">"us-east-1"</span></span>
+<span id="cb1-8"><a href=""></a>response <span class="op">=</span> client.get_object(<span class="st">"desarrollo"</span>,</span>
+<span id="cb1-9"><a href=""></a>  <span class="st">"ooee/clases_ia/datos/data_simpsons.parquet"</span>)</span>
+<span id="cb1-10"><a href=""></a>content <span class="op">=</span> response.read()</span>
+<span id="cb1-11"><a href=""></a>data <span class="op">=</span> pd.read_parquet(io.BytesIO(content))</span>
+<span id="cb1-12"><a href=""></a><span class="bu">print</span>(<span class="ss">f"Shape: </span><span class="sc">{</span>data<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-13"><a href=""></a><span class="bu">print</span>(<span class="ss">f"Columnas: </span><span class="sc">{</span>data<span class="sc">.</span>columns<span class="sc">.</span>tolist()<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Shape: (69171, 2)
 Columnas: ['raw_character_text', 'spoken_words']</code></pre>
 </div>
 </div>
-<p><img data-src="imagenes/simpsons3d.jpg" style="width:45.0%"></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="imagenes/simpsons3d.jpg" style="width:85.0%"></p>
+</div></div>
 </section>
 <section id="datos-los-simpsons-1" class="slide level2">
 <h2>Datos: Los Simpsons</h2>
 <div class="medium-par">
 <p>Veamos cuántas líneas tiene cada personaje:</p>
 </div>
-<div id="9b10cf36" class="cell" data-execution_count="3">
+<div id="56ea5df9" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href=""></a>data[<span class="st">'raw_character_text'</span>].value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>raw_character_text
@@ -264,7 +278,7 @@ Name: count, dtype: int64</code></pre>
 <div class="medium-par">
 <p>Algunos ejemplos de diálogos:</p>
 </div>
-<div id="114181f8" class="cell" data-execution_count="4">
+<div id="4c78a797" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href=""></a><span class="cf">for</span> personaje <span class="kw">in</span> data[<span class="st">'raw_character_text'</span>].unique():</span>
 <span id="cb5-2"><a href=""></a>    ejemplo <span class="op">=</span> data[data[<span class="st">'raw_character_text'</span>] <span class="op">==</span> personaje][<span class="st">'spoken_words'</span>].dropna().iloc[<span class="dv">0</span>]</span>
 <span id="cb5-3"><a href=""></a>    <span class="bu">print</span>(<span class="ss">f"[</span><span class="sc">{</span>personaje<span class="sc">}</span><span class="ss">]: </span><span class="sc">{</span>ejemplo<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -296,7 +310,7 @@ Name: count, dtype: int64</code></pre>
 <div class="medium-par">
 <p>Hay filas con texto vacío. Las eliminamos antes de continuar:</p>
 </div>
-<div id="207ec2e7" class="cell" data-execution_count="5">
+<div id="1c8c064f" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href=""></a><span class="bu">print</span>(<span class="ss">f"Filas antes: </span><span class="sc">{</span><span class="bu">len</span>(data)<span class="sc">:,}</span><span class="ss">"</span>)</span>
 <span id="cb7-2"><a href=""></a>data_filter <span class="op">=</span> data.dropna(subset<span class="op">=</span>[<span class="st">'spoken_words'</span>])</span>
 <span id="cb7-3"><a href=""></a>data_filter <span class="op">=</span> data_filter[data_filter[<span class="st">'spoken_words'</span>].<span class="bu">str</span>.strip().astype(<span class="bu">bool</span>)].copy()</span>
@@ -402,7 +416,7 @@ Eliminadas: 4,398</code></pre>
 </ul>
 </div>
 <div class="fragment small-par">
-<div id="05b7cce8" class="cell" data-execution_count="6">
+<div id="6a53ec1a" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href=""></a>stemmer <span class="op">=</span> SnowballStemmer(<span class="st">"spanish"</span>)</span>
 <span id="cb9-2"><a href=""></a></span>
 <span id="cb9-3"><a href=""></a>palabras <span class="op">=</span> [<span class="st">"corriendo"</span>, <span class="st">"corrió"</span>, <span class="st">"corre"</span>, <span class="st">"corredor"</span>]</span>
@@ -445,40 +459,40 @@ Eliminadas: 4,398</code></pre>
 <div class="medium-par">
 <p>Definimos una función que aplica todo el pipeline de limpieza:</p>
 </div>
-<div id="7241d026" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="annotated-cell-5"><pre class="sourceCode numberSource python code-annotation-code number-lines code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-5-1"><a href="#annotated-cell-5-1"></a>stop_es <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'spanish'</span>))</span>
-<span id="annotated-cell-5-2"><a href="#annotated-cell-5-2"></a>stemmer_es <span class="op">=</span> SnowballStemmer(<span class="st">"spanish"</span>)</span>
-<span id="annotated-cell-5-3"><a href="#annotated-cell-5-3"></a></span>
-<span id="annotated-cell-5-4"><a href="#annotated-cell-5-4"></a>stop_en <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'english'</span>))</span>
-<span id="annotated-cell-5-5"><a href="#annotated-cell-5-5"></a>stemmer_en <span class="op">=</span> SnowballStemmer(<span class="st">"english"</span>)</span>
-<span id="annotated-cell-5-6"><a href="#annotated-cell-5-6"></a></span>
-<span id="annotated-cell-5-7"><a href="#annotated-cell-5-7"></a><span class="kw">def</span> quitar_acentos(texto):</span>
-<span id="annotated-cell-5-8"><a href="#annotated-cell-5-8"></a>    texto <span class="op">=</span> unicodedata.normalize(<span class="st">'NFD'</span>, texto)</span>
-<span id="annotated-cell-5-9"><a href="#annotated-cell-5-9"></a>    texto <span class="op">=</span> <span class="st">''</span>.join(c <span class="cf">for</span> c <span class="kw">in</span> texto <span class="cf">if</span> unicodedata.category(c) <span class="op">!=</span> <span class="st">'Mn'</span>)</span>
-<span id="annotated-cell-5-10"><a href="#annotated-cell-5-10"></a>    <span class="cf">return</span> texto</span>
-<span id="annotated-cell-5-11"><a href="#annotated-cell-5-11"></a></span>
-<span id="annotated-cell-5-12"><a href="#annotated-cell-5-12"></a><span class="kw">def</span> limpiar_texto(texto, stopwords, stemmer):</span>
-<span id="annotated-cell-5-13"><a href="#annotated-cell-5-13"></a>    texto  <span class="op">=</span> texto.lower()                          <span class="co"># minúsculas</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="1">1</button><span id="annotated-cell-5-14" class="code-annotation-target"><a href="#annotated-cell-5-14"></a>    <span class="co"># texto  = quitar_acentos(texto)</span></span>
-<span id="annotated-cell-5-15"><a href="#annotated-cell-5-15"></a>    texto  <span class="op">=</span> re.sub(<span class="vs">r'</span><span class="dv">\d</span><span class="op">+</span><span class="vs">'</span>, <span class="st">' '</span>, texto)             <span class="co"># eliminar números</span></span>
-<span id="annotated-cell-5-16"><a href="#annotated-cell-5-16"></a>    texto  <span class="op">=</span> re.sub(<span class="vs">r'</span><span class="pp">[^</span><span class="dv">\w\s</span><span class="pp">]</span><span class="vs">'</span>, <span class="st">' '</span>, texto)         <span class="co"># eliminar puntuación</span></span>
-<span id="annotated-cell-5-17"><a href="#annotated-cell-5-17"></a>    tokens <span class="op">=</span> texto.split()</span>
-<span id="annotated-cell-5-18"><a href="#annotated-cell-5-18"></a>    tokens <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> tokens <span class="cf">if</span> t <span class="kw">not</span> <span class="kw">in</span> stopwords <span class="kw">and</span> <span class="bu">len</span>(t) <span class="op">&gt;=</span> <span class="dv">3</span>]  <span class="co"># stopwords + largo mínimo</span></span>
-<button class="code-annotation-anchor" data-target-cell="annotated-cell-5" data-target-annotation="2">2</button><span id="annotated-cell-5-19" class="code-annotation-target"><a href="#annotated-cell-5-19"></a>    tokens <span class="op">=</span> [quitar_acentos(t) <span class="cf">for</span> t <span class="kw">in</span> tokens]</span>
-<span id="annotated-cell-5-20"><a href="#annotated-cell-5-20"></a>    tokens <span class="op">=</span> [stemmer.stem(t) <span class="cf">for</span> t <span class="kw">in</span> tokens]      <span class="co"># stemming</span></span>
-<span id="annotated-cell-5-21"><a href="#annotated-cell-5-21"></a>    <span class="cf">return</span> <span class="st">' '</span>.join(tokens)</span>
-<span id="annotated-cell-5-22"><a href="#annotated-cell-5-22"></a></span>
-<span id="annotated-cell-5-23"><a href="#annotated-cell-5-23"></a><span class="bu">print</span>(limpiar_texto(<span class="st">"hola, Homero. Cómo te encuentras en el día de hoy?"</span>,</span>
-<span id="annotated-cell-5-24"><a href="#annotated-cell-5-24"></a>                  stopwords<span class="op">=</span>stop_es, stemmer<span class="op">=</span>stemmer_es))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="2817c45a" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="annotated-cell-4"><pre class="sourceCode numberSource python code-annotation-code number-lines code-with-copy code-annotated"><code class="sourceCode python"><span id="annotated-cell-4-1"><a href="#annotated-cell-4-1"></a>stop_es <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'spanish'</span>))</span>
+<span id="annotated-cell-4-2"><a href="#annotated-cell-4-2"></a>stemmer_es <span class="op">=</span> SnowballStemmer(<span class="st">"spanish"</span>)</span>
+<span id="annotated-cell-4-3"><a href="#annotated-cell-4-3"></a></span>
+<span id="annotated-cell-4-4"><a href="#annotated-cell-4-4"></a>stop_en <span class="op">=</span> <span class="bu">set</span>(stopwords.words(<span class="st">'english'</span>))</span>
+<span id="annotated-cell-4-5"><a href="#annotated-cell-4-5"></a>stemmer_en <span class="op">=</span> SnowballStemmer(<span class="st">"english"</span>)</span>
+<span id="annotated-cell-4-6"><a href="#annotated-cell-4-6"></a></span>
+<span id="annotated-cell-4-7"><a href="#annotated-cell-4-7"></a><span class="kw">def</span> quitar_acentos(texto):</span>
+<span id="annotated-cell-4-8"><a href="#annotated-cell-4-8"></a>    texto <span class="op">=</span> unicodedata.normalize(<span class="st">'NFD'</span>, texto)</span>
+<span id="annotated-cell-4-9"><a href="#annotated-cell-4-9"></a>    texto <span class="op">=</span> <span class="st">''</span>.join(c <span class="cf">for</span> c <span class="kw">in</span> texto <span class="cf">if</span> unicodedata.category(c) <span class="op">!=</span> <span class="st">'Mn'</span>)</span>
+<span id="annotated-cell-4-10"><a href="#annotated-cell-4-10"></a>    <span class="cf">return</span> texto</span>
+<span id="annotated-cell-4-11"><a href="#annotated-cell-4-11"></a></span>
+<span id="annotated-cell-4-12"><a href="#annotated-cell-4-12"></a><span class="kw">def</span> limpiar_texto(texto, stopwords, stemmer):</span>
+<span id="annotated-cell-4-13"><a href="#annotated-cell-4-13"></a>    texto  <span class="op">=</span> texto.lower()                          <span class="co"># minúsculas</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="1">1</button><span id="annotated-cell-4-14" class="code-annotation-target"><a href="#annotated-cell-4-14"></a>    <span class="co"># texto  = quitar_acentos(texto)</span></span>
+<span id="annotated-cell-4-15"><a href="#annotated-cell-4-15"></a>    texto  <span class="op">=</span> re.sub(<span class="vs">r'</span><span class="dv">\d</span><span class="op">+</span><span class="vs">'</span>, <span class="st">' '</span>, texto)             <span class="co"># eliminar números</span></span>
+<span id="annotated-cell-4-16"><a href="#annotated-cell-4-16"></a>    texto  <span class="op">=</span> re.sub(<span class="vs">r'</span><span class="pp">[^</span><span class="dv">\w\s</span><span class="pp">]</span><span class="vs">'</span>, <span class="st">' '</span>, texto)         <span class="co"># eliminar puntuación</span></span>
+<span id="annotated-cell-4-17"><a href="#annotated-cell-4-17"></a>    tokens <span class="op">=</span> texto.split()</span>
+<span id="annotated-cell-4-18"><a href="#annotated-cell-4-18"></a>    tokens <span class="op">=</span> [t <span class="cf">for</span> t <span class="kw">in</span> tokens <span class="cf">if</span> t <span class="kw">not</span> <span class="kw">in</span> stopwords <span class="kw">and</span> <span class="bu">len</span>(t) <span class="op">&gt;=</span> <span class="dv">3</span>]  <span class="co"># stopwords + largo mínimo</span></span>
+<button class="code-annotation-anchor" data-target-cell="annotated-cell-4" data-target-annotation="2">2</button><span id="annotated-cell-4-19" class="code-annotation-target"><a href="#annotated-cell-4-19"></a>    tokens <span class="op">=</span> [quitar_acentos(t) <span class="cf">for</span> t <span class="kw">in</span> tokens]</span>
+<span id="annotated-cell-4-20"><a href="#annotated-cell-4-20"></a>    tokens <span class="op">=</span> [stemmer.stem(t) <span class="cf">for</span> t <span class="kw">in</span> tokens]      <span class="co"># stemming</span></span>
+<span id="annotated-cell-4-21"><a href="#annotated-cell-4-21"></a>    <span class="cf">return</span> <span class="st">' '</span>.join(tokens)</span>
+<span id="annotated-cell-4-22"><a href="#annotated-cell-4-22"></a></span>
+<span id="annotated-cell-4-23"><a href="#annotated-cell-4-23"></a><span class="bu">print</span>(limpiar_texto(<span class="st">"hola, Homero. Cómo te encuentras en el día de hoy?"</span>,</span>
+<span id="annotated-cell-4-24"><a href="#annotated-cell-4-24"></a>                  stopwords<span class="op">=</span>stop_es, stemmer<span class="op">=</span>stemmer_es))</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-annotation">
 <dl class="code-annotation-container-hidden code-annotation-container-grid">
-<dt data-target-cell="annotated-cell-5" data-target-annotation="1">1</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="14" data-code-annotation="1">¿Por qué no quitamos los acentos aquí?</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="14" data-code-annotation="1">¿Por qué no quitamos los acentos aquí?</span>
 </dd>
-<dt data-target-cell="annotated-cell-5" data-target-annotation="2">2</dt>
+<dt data-target-cell="annotated-cell-4" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-5" data-code-lines="19" data-code-annotation="2">Y los terminamos quitando aquí?</span>
+<span data-code-cell="annotated-cell-4" data-code-lines="19" data-code-annotation="2">Y los terminamos quitando aquí?</span>
 </dd>
 </dl>
 </div>
@@ -505,7 +519,7 @@ Eliminadas: 4,398</code></pre>
 <div class="medium-par">
 <p>Aplicamos la función a todo el corpus:</p>
 </div>
-<div id="d6eeb547" class="cell" data-execution_count="8">
+<div id="056bfac6" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href=""></a>data_filter[<span class="st">'texto_limpio'</span>] <span class="op">=</span> data_filter[<span class="st">'spoken_words'</span>].<span class="bu">apply</span>(limpiar_texto,</span>
 <span id="cb12-2"><a href=""></a>                  stopwords<span class="op">=</span>stop_en, stemmer<span class="op">=</span>stemmer_en) <span class="co">#Cambiamos a inglés</span></span>
 <span id="cb12-3"><a href=""></a></span>
@@ -543,7 +557,7 @@ Reducción: 50.8%</code></pre>
 </div>
 <div class="columns">
 <div class="column" style="width:80%;">
-<div id="75775a70" class="cell col3070 columns column-output-location" data-execution_count="9">
+<div id="2c3a0096" class="cell col3070 columns column-output-location" data-execution_count="9">
 <div class="column">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href=""></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
 <span id="cb14-2"><a href=""></a></span>
@@ -560,89 +574,89 @@ Reducción: 50.8%</code></pre>
 <style type="text/css">
 </style>
 
-<table id="T_1cdb8" class="caption-top" data-quarto-postprocess="true" style="margin: 0">
+<table id="T_81bcb" class="caption-top" data-quarto-postprocess="true" style="margin: 0">
 <thead>
 <tr class="header">
 <th class="blank level0" data-quarto-table-cell-role="th">&nbsp;</th>
-<th id="T_1cdb8_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">término</th>
-<th id="T_1cdb8_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">frecuencia</th>
+<th id="T_81bcb_level0_col0" class="col_heading level0 col0" data-quarto-table-cell-role="th">término</th>
+<th id="T_81bcb_level0_col1" class="col_heading level0 col1" data-quarto-table-cell-role="th">frecuencia</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td id="T_1cdb8_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">0</td>
-<td id="T_1cdb8_row0_col0" class="data row0 col0">get</td>
-<td id="T_1cdb8_row0_col1" class="data row0 col1">3187</td>
+<td id="T_81bcb_level0_row0" class="row_heading level0 row0" data-quarto-table-cell-role="th">0</td>
+<td id="T_81bcb_row0_col0" class="data row0 col0">get</td>
+<td id="T_81bcb_row0_col1" class="data row0 col1">3187</td>
 </tr>
 <tr class="even">
-<td id="T_1cdb8_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">1</td>
-<td id="T_1cdb8_row1_col0" class="data row1 col0">like</td>
-<td id="T_1cdb8_row1_col1" class="data row1 col1">2992</td>
+<td id="T_81bcb_level0_row1" class="row_heading level0 row1" data-quarto-table-cell-role="th">1</td>
+<td id="T_81bcb_row1_col0" class="data row1 col0">like</td>
+<td id="T_81bcb_row1_col1" class="data row1 col1">2992</td>
 </tr>
 <tr class="odd">
-<td id="T_1cdb8_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">2</td>
-<td id="T_1cdb8_row2_col0" class="data row2 col0">well</td>
-<td id="T_1cdb8_row2_col1" class="data row2 col1">2757</td>
+<td id="T_81bcb_level0_row2" class="row_heading level0 row2" data-quarto-table-cell-role="th">2</td>
+<td id="T_81bcb_row2_col0" class="data row2 col0">well</td>
+<td id="T_81bcb_row2_col1" class="data row2 col1">2757</td>
 </tr>
 <tr class="even">
-<td id="T_1cdb8_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">3</td>
-<td id="T_1cdb8_row3_col0" class="data row3 col0">know</td>
-<td id="T_1cdb8_row3_col1" class="data row3 col1">2628</td>
+<td id="T_81bcb_level0_row3" class="row_heading level0 row3" data-quarto-table-cell-role="th">3</td>
+<td id="T_81bcb_row3_col0" class="data row3 col0">know</td>
+<td id="T_81bcb_row3_col1" class="data row3 col1">2628</td>
 </tr>
 <tr class="odd">
-<td id="T_1cdb8_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">4</td>
-<td id="T_1cdb8_row4_col0" class="data row4 col0">dad</td>
-<td id="T_1cdb8_row4_col1" class="data row4 col1">2334</td>
+<td id="T_81bcb_level0_row4" class="row_heading level0 row4" data-quarto-table-cell-role="th">4</td>
+<td id="T_81bcb_row4_col0" class="data row4 col0">dad</td>
+<td id="T_81bcb_row4_col1" class="data row4 col1">2334</td>
 </tr>
 <tr class="even">
-<td id="T_1cdb8_level0_row5" class="row_heading level0 row5" data-quarto-table-cell-role="th">5</td>
-<td id="T_1cdb8_row5_col0" class="data row5 col0">one</td>
-<td id="T_1cdb8_row5_col1" class="data row5 col1">2266</td>
+<td id="T_81bcb_level0_row5" class="row_heading level0 row5" data-quarto-table-cell-role="th">5</td>
+<td id="T_81bcb_row5_col0" class="data row5 col0">one</td>
+<td id="T_81bcb_row5_col1" class="data row5 col1">2266</td>
 </tr>
 <tr class="odd">
-<td id="T_1cdb8_level0_row6" class="row_heading level0 row6" data-quarto-table-cell-role="th">6</td>
-<td id="T_1cdb8_row6_col0" class="data row6 col0">bart</td>
-<td id="T_1cdb8_row6_col1" class="data row6 col1">2171</td>
+<td id="T_81bcb_level0_row6" class="row_heading level0 row6" data-quarto-table-cell-role="th">6</td>
+<td id="T_81bcb_row6_col0" class="data row6 col0">bart</td>
+<td id="T_81bcb_row6_col1" class="data row6 col1">2171</td>
 </tr>
 <tr class="even">
-<td id="T_1cdb8_level0_row7" class="row_heading level0 row7" data-quarto-table-cell-role="th">7</td>
-<td id="T_1cdb8_row7_col0" class="data row7 col0">right</td>
-<td id="T_1cdb8_row7_col1" class="data row7 col1">1993</td>
+<td id="T_81bcb_level0_row7" class="row_heading level0 row7" data-quarto-table-cell-role="th">7</td>
+<td id="T_81bcb_row7_col0" class="data row7 col0">right</td>
+<td id="T_81bcb_row7_col1" class="data row7 col1">1993</td>
 </tr>
 <tr class="odd">
-<td id="T_1cdb8_level0_row8" class="row_heading level0 row8" data-quarto-table-cell-role="th">8</td>
-<td id="T_1cdb8_row8_col0" class="data row8 col0">look</td>
-<td id="T_1cdb8_row8_col1" class="data row8 col1">1933</td>
+<td id="T_81bcb_level0_row8" class="row_heading level0 row8" data-quarto-table-cell-role="th">8</td>
+<td id="T_81bcb_row8_col0" class="data row8 col0">look</td>
+<td id="T_81bcb_row8_col1" class="data row8 col1">1933</td>
 </tr>
 <tr class="even">
-<td id="T_1cdb8_level0_row9" class="row_heading level0 row9" data-quarto-table-cell-role="th">9</td>
-<td id="T_1cdb8_row9_col0" class="data row9 col0">hey</td>
-<td id="T_1cdb8_row9_col1" class="data row9 col1">1922</td>
+<td id="T_81bcb_level0_row9" class="row_heading level0 row9" data-quarto-table-cell-role="th">9</td>
+<td id="T_81bcb_row9_col0" class="data row9 col0">hey</td>
+<td id="T_81bcb_row9_col1" class="data row9 col1">1922</td>
 </tr>
 <tr class="odd">
-<td id="T_1cdb8_level0_row10" class="row_heading level0 row10" data-quarto-table-cell-role="th">10</td>
-<td id="T_1cdb8_row10_col0" class="data row10 col0">marg</td>
-<td id="T_1cdb8_row10_col1" class="data row10 col1">1911</td>
+<td id="T_81bcb_level0_row10" class="row_heading level0 row10" data-quarto-table-cell-role="th">10</td>
+<td id="T_81bcb_row10_col0" class="data row10 col0">marg</td>
+<td id="T_81bcb_row10_col1" class="data row10 col1">1911</td>
 </tr>
 <tr class="even">
-<td id="T_1cdb8_level0_row11" class="row_heading level0 row11" data-quarto-table-cell-role="th">11</td>
-<td id="T_1cdb8_row11_col0" class="data row11 col0">homer</td>
-<td id="T_1cdb8_row11_col1" class="data row11 col1">1902</td>
+<td id="T_81bcb_level0_row11" class="row_heading level0 row11" data-quarto-table-cell-role="th">11</td>
+<td id="T_81bcb_row11_col0" class="data row11 col0">homer</td>
+<td id="T_81bcb_row11_col1" class="data row11 col1">1902</td>
 </tr>
 <tr class="odd">
-<td id="T_1cdb8_level0_row12" class="row_heading level0 row12" data-quarto-table-cell-role="th">12</td>
-<td id="T_1cdb8_row12_col0" class="data row12 col0">think</td>
-<td id="T_1cdb8_row12_col1" class="data row12 col1">1822</td>
+<td id="T_81bcb_level0_row12" class="row_heading level0 row12" data-quarto-table-cell-role="th">12</td>
+<td id="T_81bcb_row12_col0" class="data row12 col0">think</td>
+<td id="T_81bcb_row12_col1" class="data row12 col1">1822</td>
 </tr>
 <tr class="even">
-<td id="T_1cdb8_level0_row13" class="row_heading level0 row13" data-quarto-table-cell-role="th">13</td>
-<td id="T_1cdb8_row13_col0" class="data row13 col0">want</td>
-<td id="T_1cdb8_row13_col1" class="data row13 col1">1803</td>
+<td id="T_81bcb_level0_row13" class="row_heading level0 row13" data-quarto-table-cell-role="th">13</td>
+<td id="T_81bcb_row13_col0" class="data row13 col0">want</td>
+<td id="T_81bcb_row13_col1" class="data row13 col1">1803</td>
 </tr>
 <tr class="odd">
-<td id="T_1cdb8_level0_row14" class="row_heading level0 row14" data-quarto-table-cell-role="th">14</td>
-<td id="T_1cdb8_row14_col0" class="data row14 col0">got</td>
-<td id="T_1cdb8_row14_col1" class="data row14 col1">1711</td>
+<td id="T_81bcb_level0_row14" class="row_heading level0 row14" data-quarto-table-cell-role="th">14</td>
+<td id="T_81bcb_row14_col0" class="data row14 col0">got</td>
+<td id="T_81bcb_row14_col1" class="data row14 col1">1711</td>
 </tr>
 </tbody>
 </table>
@@ -716,7 +730,7 @@ Reducción: 50.8%</code></pre>
 </section>
 <section id="bag-of-words-ejemplo" class="slide level2">
 <h2>Bag of Words: ejemplo</h2>
-<div id="15ad11ef" class="cell" data-execution_count="10">
+<div id="6c9fb599" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href=""></a>ejemplo <span class="op">=</span> [</span>
 <span id="cb15-2"><a href=""></a>    <span class="st">"Soy intelectual, muy inteligente, soy intelectual, muy inteligente. Tú no, niño"</span>,</span>
 <span id="cb15-3"><a href=""></a>    <span class="st">"El niño no es inteligente"</span>,</span>
@@ -881,7 +895,7 @@ Reducción: 50.8%</code></pre>
 </div>
 <aside class="notes">
 <ul>
-<li>Si <span class="math inline">\(t\)</span> aparece en <strong>todos</strong> los documentos → <span class="math inline">\(IDF \approx 1\)</span> → el término <span class="math inline">\(TF-IDF\approx TF\)</span> .</li>
+<li>Si <span class="math inline">\(t\)</span> aparece en <strong>todos</strong> los documentos → <span class="math inline">\(IDF \approx log(1)=0\)</span> → el término <span class="math inline">\(TF-IDF\approx 0\)</span> .</li>
 <li>Si <span class="math inline">\(t\)</span> es <strong>exclusivo</strong> de pocos documentos → <span class="math inline">\(IDF\)</span> alto → el término gana peso.</li>
 </ul>
 <style type="text/css">
@@ -906,7 +920,7 @@ Reducción: 50.8%</code></pre>
 </section>
 <section id="tf-idf-implementación" class="slide level2">
 <h2>TF-IDF: implementación</h2>
-<div id="a54bca0b" class="cell columns column-output-location" data-execution_count="11">
+<div id="c210e99c" class="cell columns column-output-location" data-execution_count="11">
 <div class="column">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href=""></a>tfidf_vec    <span class="op">=</span> TfidfVectorizer(norm<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb16-2"><a href=""></a>                      smooth_idf<span class="op">=</span><span class="va">False</span>)</span>
@@ -1109,7 +1123,7 @@ Reducción: 50.8%</code></pre>
 <div class="medium-par">
 <p>Filtramos el dataset para quedarnos solo con dos personajes:</p>
 </div>
-<div id="0cb6b883" class="cell" data-execution_count="12">
+<div id="aa7e8263" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href=""></a><span class="co"># Eliminamos filas con texto limpio vacío</span></span>
 <span id="cb17-2"><a href=""></a>data_filter <span class="op">=</span> data_filter[data_filter[<span class="st">'texto_limpio'</span>].<span class="bu">str</span>.strip().astype(<span class="bu">bool</span>)].copy()</span>
 <span id="cb17-3"><a href=""></a></span>
@@ -1142,7 +1156,7 @@ Name: count, dtype: int64</code></pre>
 <div class="medium-par">
 <p>Separamos los datos manteniendo la proporción de clases (<em>stratified split</em>):</p>
 </div>
-<div id="8c4b79d9" class="cell" data-execution_count="13">
+<div id="3924d442" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href=""></a>X_bin <span class="op">=</span> data_bin[<span class="st">'texto_limpio'</span>]</span>
 <span id="cb19-2"><a href=""></a><span class="co"># Mapeamos explícitamente Marge Simpson (menor incidencia) como la clase positiva (1) y Homero Simpson como la clase negativa (0)</span></span>
 <span id="cb19-3"><a href=""></a>y_bin <span class="op">=</span> data_bin[<span class="st">'raw_character_text'</span>].<span class="bu">map</span>({<span class="st">'Homero Simpson'</span>: <span class="dv">0</span>, <span class="st">'Marge Simpson'</span>: <span class="dv">1</span>})</span>
@@ -1177,7 +1191,7 @@ Name: count, dtype: int64</code></pre>
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="fragment">
-<div id="62680522" class="cell" data-execution_count="14">
+<div id="508e44ad" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href=""></a>pipeline_bin <span class="op">=</span> Pipeline([</span>
 <span id="cb21-2"><a href=""></a>    (<span class="st">'vectorizer'</span>, CountVectorizer(</span>
 <span id="cb21-3"><a href=""></a>        min_df<span class="op">=</span><span class="dv">10</span>, <span class="co"># ignora términos que aparecen en menos de 10 docs</span></span>
@@ -1253,7 +1267,7 @@ Name: count, dtype: int64</code></pre>
 <div class="medium-par">
 <p>Entrenamos con validación cruzada para estimar el desempeño antes de evaluar en test:</p>
 </div>
-<div id="596d8d6d" class="cell" data-execution_count="15">
+<div id="6cc8537a" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href=""></a>cv <span class="op">=</span> StratifiedKFold(n_splits<span class="op">=</span><span class="dv">5</span>, shuffle<span class="op">=</span><span class="va">True</span>, random_state<span class="op">=</span><span class="dv">42</span>)</span>
 <span id="cb22-2"><a href=""></a></span>
 <span id="cb22-3"><a href=""></a>scores_f1 <span class="op">=</span> cross_val_score(</span>
@@ -1297,7 +1311,7 @@ Modelo entrenado.</code></pre>
 <div class="medium-par">
 <p>En clasificación binaria, la matriz de confusión es una tabla 2×2 que muestra las predicciones correctas e incorrectas:</p>
 </div>
-<div id="1995a245" class="cell columns column-output-location" data-execution_count="16">
+<div id="0fb7c53f" class="cell columns column-output-location" data-execution_count="16">
 <div class="column">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href=""></a>y_pred_bin <span class="op">=</span> pipeline_bin.predict(X_test_bin)</span>
 <span id="cb24-2"><a href=""></a></span>
@@ -1401,7 +1415,7 @@ Modelo entrenado.</code></pre>
 <div class="medium-par">
 <p><code>classification_report</code> entrega precisión, recall y F1 para cada clase:</p>
 </div>
-<div id="e5b9a64e" class="cell" data-execution_count="17">
+<div id="9b7ed9de" class="cell" data-execution_count="17">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href=""></a><span class="bu">print</span>(classification_report(y_test_bin, y_pred_bin, target_names<span class="op">=</span>[<span class="st">'Homero Simpson'</span>, <span class="st">'Marge Simpson'</span>]))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                precision    recall  f1-score   support
@@ -1424,7 +1438,7 @@ Homero Simpson       0.75      0.91      0.82      5376
 <div class="medium-par">
 <p>Comparamos ambas estrategias de vectorización:</p>
 </div>
-<div id="c886beb0" class="cell" data-execution_count="18">
+<div id="bd2e9428" class="cell" data-execution_count="18">
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href=""></a><span class="kw">def</span> metricas(nombre, y_true, y_pred):</span>
 <span id="cb27-2"><a href=""></a>    <span class="cf">return</span> {</span>
 <span id="cb27-3"><a href=""></a>        <span class="st">'Modelo'</span>:     nombre,</span>
@@ -1502,7 +1516,7 @@ Homero Simpson       0.75      0.91      0.82      5376
 <div class="medium-par">
 <p>En clasificación binaria, la regresión logística tiene un solo vector de coeficientes. Las palabras con coeficiente positivo apuntan a una clase y las negativas a la otra:</p>
 </div>
-<div id="4d0749e9" class="cell columns column-output-location" data-fig-height="4" data-execution_count="19">
+<div id="6a358985" class="cell columns column-output-location" data-fig-height="4" data-execution_count="19">
 <div class="column">
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href=""></a>feature_names <span class="op">=</span> pipeline_bin.named_steps[<span class="st">'vectorizer'</span>].get_feature_names_out()</span>
 <span id="cb28-2"><a href=""></a>coefs         <span class="op">=</span> pipeline_bin.named_steps[<span class="st">'clf'</span>].coef_[<span class="dv">0</span>]</span>
@@ -1554,7 +1568,7 @@ Homero Simpson       0.75      0.91      0.82      5376
 </section>
 <section id="entrenamiento-toda-la-familia" class="slide level2">
 <h2>Entrenamiento: toda la familia</h2>
-<div id="b7846996" class="cell" data-execution_count="20">
+<div id="5f644f5a" class="cell" data-execution_count="20">
 <div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href=""></a>X <span class="op">=</span> data_filter[<span class="st">'texto_limpio'</span>]</span>
 <span id="cb29-2"><a href=""></a>y <span class="op">=</span> data_filter[<span class="st">'raw_character_text'</span>]</span>
 <span id="cb29-3"><a href=""></a></span>
@@ -1596,7 +1610,7 @@ Name: count, dtype: int64</code></pre>
 </section>
 <section id="entrenamiento-toda-la-familia-1" class="slide level2">
 <h2>Entrenamiento: toda la familia</h2>
-<div id="6555d504" class="cell" data-execution_count="21">
+<div id="5b37a942" class="cell" data-execution_count="21">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href=""></a>pipeline_lr <span class="op">=</span> Pipeline([</span>
 <span id="cb31-2"><a href=""></a>    (<span class="st">'vectorizer'</span>, CountVectorizer(min_df<span class="op">=</span><span class="dv">10</span>, max_features<span class="op">=</span><span class="dv">20000</span>, ngram_range<span class="op">=</span>(<span class="dv">1</span>, <span class="dv">2</span>))),</span>
 <span id="cb31-3"><a href=""></a>    (<span class="st">'clf'</span>, LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>, C<span class="op">=</span><span class="fl">1.0</span>))</span>
@@ -1633,7 +1647,7 @@ Name: count, dtype: int64</code></pre>
 <div class="medium-par">
 <p>Ahora la matriz es de 4×4. La diagonal muestra las clasificaciones correctas:</p>
 </div>
-<div id="b3891172" class="cell columns column-output-location" data-execution_count="22">
+<div id="64e0bd31" class="cell columns column-output-location" data-execution_count="22">
 <div class="column">
 <div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href=""></a>y_pred_lr <span class="op">=</span> pipeline_lr.predict(X_test)</span>
 <span id="cb33-2"><a href=""></a></span>
@@ -1660,7 +1674,7 @@ Name: count, dtype: int64</code></pre>
 </section>
 <section id="reporte-de-clasificación-4-personajes" class="slide level2">
 <h2>Reporte de clasificación: 4 personajes</h2>
-<div id="46552a46" class="cell" data-execution_count="23">
+<div id="3ce1e4fa" class="cell" data-execution_count="23">
 <div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href=""></a><span class="bu">print</span>(classification_report(y_test, y_pred_lr))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                precision    recall  f1-score   support
@@ -1728,7 +1742,7 @@ Homero Simpson       0.53      0.80      0.64      5376
 <p>Ejemplo con nuestros datos:</p>
 </div>
 <div class="fragment">
-<div id="29b1a6fe" class="cell" data-execution_count="24">
+<div id="25bbff4d" class="cell" data-execution_count="24">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href=""></a>f1_mac <span class="op">=</span> f1_score(y_test, y_pred_lr, average<span class="op">=</span><span class="st">'macro'</span>)</span>
 <span id="cb36-2"><a href=""></a>f1_wgt <span class="op">=</span> f1_score(y_test, y_pred_lr, average<span class="op">=</span><span class="st">'weighted'</span>)</span>
 <span id="cb36-3"><a href=""></a></span>
@@ -1758,7 +1772,7 @@ F1 weighted: 0.484  (Homero pesa más porque tiene más líneas)</code></pre>
 </section>
 <section id="comparación-de-modelos" class="slide level2">
 <h2>Comparación de modelos</h2>
-<div id="dcb318be" class="cell" data-execution_count="25">
+<div id="4e6fe055" class="cell" data-execution_count="25">
 <div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href=""></a>y_pred_nb <span class="op">=</span> pipeline_nb.predict(X_test)</span>
 <span id="cb38-2"><a href=""></a></span>
 <span id="cb38-3"><a href=""></a>resultados <span class="op">=</span> pd.DataFrame([</span>
@@ -1820,7 +1834,7 @@ F1 weighted: 0.484  (Homero pesa más porque tiene más líneas)</code></pre>
 </section>
 <section id="comparando-bow-vs.-tf-idf" class="slide level2">
 <h2>Comparando BOW vs.&nbsp;TF-IDF</h2>
-<div id="c792f640" class="cell" data-execution_count="26">
+<div id="c6d16c89" class="cell" data-execution_count="26">
 <div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href=""></a>pipeline_tfidf <span class="op">=</span> Pipeline([</span>
 <span id="cb39-2"><a href=""></a>    (<span class="st">'vectorizer'</span>, TfidfVectorizer(min_df<span class="op">=</span><span class="dv">10</span>, max_features<span class="op">=</span><span class="dv">20000</span>)),</span>
 <span id="cb39-3"><a href=""></a>    (<span class="st">'clf'</span>, LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>, C<span class="op">=</span><span class="fl">1.0</span>))</span>
@@ -1894,7 +1908,7 @@ F1 weighted: 0.484  (Homero pesa más porque tiene más líneas)</code></pre>
 <div class="medium-par">
 <p>En multiclase, la regresión logística tiene un vector de coeficientes <strong>por cada clase</strong>. Veamos las 10 palabras más asociadas a cada personaje:</p>
 </div>
-<div id="0eb2a6af" class="cell" data-execution_count="27">
+<div id="fdb092f0" class="cell" data-execution_count="27">
 <div class="cell-output cell-output-display">
 <div>
 <figure>
@@ -1946,6 +1960,10 @@ F1 weighted: 0.484  (Homero pesa más porque tiene más líneas)</code></pre>
 <li class="fragment"><strong>Umbral de decisión</strong>: ajustar con <code>predict_proba()</code> para optimizar precisión vs.&nbsp;recall según el problema.</li>
 </ul>
 </div>
+</section>
+<section id="ejercicio-para-hacer" class="slide level2">
+<h2>Ejercicio para hacer</h2>
+<p>Les dejé un archivo <code>ciuo.parquet</code>. La idea es que entrenen un clasificador ciuo usando los conceptos aprendidos en esta clase.</p>
 </section></section>
 <section id="section-1" class="title-slide slide level1 center">
 <h1></h1>
@@ -1954,8 +1972,26 @@ F1 weighted: 0.484  (Homero pesa más porque tiene más líneas)</code></pre>
 <p><span class="big-par center-justified"><strong>Área de Ciencia de Datos</strong></span></p>
 <p><span class="big-par center-justified"><strong>Unidad de Gobierno de Datos</strong></span></p>
 <p><span class="big-par center-justified"><strong>Mayo 2026</strong></span></p>
+</section>
+
+<section>
+<section id="anexo-1" class="title-slide slide level1 center" data-visibility="uncounted">
+<h1>Anexo 1</h1>
 
 </section>
+<section id="muestra-1" class="slide level2" data-visibility="uncounted">
+<h2>Muestra 1</h2>
+<p><img data-src="imagenes/muestra1.png" style="width:80.0%"></p>
+</section>
+<section id="muestra-2" class="slide level2" data-visibility="uncounted">
+<h2>Muestra 2</h2>
+<p><img data-src="imagenes/muestra2.png" style="width:80.0%"></p>
+</section>
+<section id="muestra-3" class="slide level2" data-visibility="uncounted">
+<h2>Muestra 3</h2>
+<p><img data-src="imagenes/muestra3.png" style="width:80.0%"></p>
+
+</section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <p><img src="imagenes/logo_portada2.png" class="slide-logo"></p>
