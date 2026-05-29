@@ -7,7 +7,7 @@ wheels/
 *.egg-info
 pruebas/
 data/
-clase-ml-texto_files/
+#clase-ml-texto_files/
 apoyo/
 # Virtual environments
 .venv
